@@ -1,97 +1,159 @@
-import { useEffect } from 'react';
-import Checkbox from '@/Components/Checkbox';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, router, usePage } from "@inertiajs/react";
+import {
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    Input,
+    VStack,
+    Button,
+    Box,
+} from "@chakra-ui/react";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import Alert from "@/Components/Fragments/Alert";
+import AuthLayout from "@/Layouts/AuthLayout";
 
-export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
+export default function LoginPage() {
+    const { flash } = usePage().props;
+    const formik = useFormik({
+        initialValues: {
+            username: "",
+            nis: "",
+            password: "",
+        },
+        onSubmit: () => {
+            const { username, nis, password } = formik.values;
+
+            router.post("/login", {
+                username,
+                nis,
+                password,
+            });
+        },
+        validationSchema: yup.object().shape({
+            username: yup.string().required("Username is required"),
+            nis: yup.string().required("NIS is required").min(10).max(10),
+            password: yup.string().required("Password is required"),
+        }),
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
-
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('login'));
+    const handleFormInput = (event) => {
+        formik.setFieldValue(event.target.name, event.target.value);
     };
-
     return (
-        <GuestLayout>
-            <Head title="Log in" />
-
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="block mt-4">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
+        <AuthLayout endpoint='Login'>
+            <h1 className="font-bold text-3xl md:text-3xl 3xl:6xl mb-2 capitalize">
+                Silahkan masukan akun anda!
+            </h1>
+            <p className="font-light text-lg mb-5 2xl:mb-10 md:text-base">
+                Masukkan Username, NIS, dan Password anda
+            </p>
+            <form onSubmit={formik.handleSubmit} className="w-full">
+                <VStack spacing={{ base: 3, md: 5 }}>
+                    <FormControl
+                        isInvalid={
+                            formik.errors.username && formik.touched.username
+                        }
+                    >
+                        <FormLabel>Username</FormLabel>
+                        <Input
+                            onChange={handleFormInput}
+                            value={formik.values.username}
+                            name="username"
+                            placeholder="Masukkan Username"
+                            _placeholder={{
+                                color: {
+                                    base: "white",
+                                    xl: "gray.500",
+                                },
+                                opacity: 0.5,
+                            }}
                         />
-                        <span className="ms-2 text-sm text-gray-600">Remember me</span>
-                    </label>
-                </div>
+                        <FormErrorMessage>
+                            {formik.errors.username}
+                        </FormErrorMessage>
+                    </FormControl>
 
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Forgot your password?
-                        </Link>
+                    <FormControl
+                        isInvalid={formik.errors.nis && formik.touched.nis}
+                    >
+                        <FormLabel>NIS</FormLabel>
+                        <Input
+                            onChange={handleFormInput}
+                            value={formik.values.nis}
+                            name="nis"
+                            placeholder="Masukkan NIS"
+                            _placeholder={{
+                                color: {
+                                    base: "white",
+                                    xl: "gray.500",
+                                },
+                                opacity: 0.5,
+                            }}
+                        />
+                        <FormErrorMessage>{formik.errors.nis}</FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl
+                        isInvalid={
+                            formik.errors.password && formik.touched.password
+                        }
+                    >
+                        <FormLabel>Password</FormLabel>
+                        <Input
+                            onChange={handleFormInput}
+                            value={formik.values.password}
+                            name="password"
+                            type="password"
+                            placeholder="*****"
+                            _placeholder={{
+                                color: {
+                                    base: "white",
+                                    xl: "gray.500",
+                                },
+                                opacity: 0.5,
+                            }}
+                        />
+                        <FormErrorMessage>
+                            {formik.errors.password}
+                        </FormErrorMessage>
+                    </FormControl>
+                    <Button
+                        type="submit"
+                        border={{ base: "1px", xl: "0" }}
+                        bg={{
+                            base: "transparent",
+                            xl: "black",
+                        }}
+                        textColor="white"
+                        _hover={{
+                            bg: {
+                                base: "white",
+                                xl: "blackAlpha.800",
+                            },
+                            textColor: {
+                                base: "gray.600",
+                                xl: "white",
+                            },
+                        }}
+                        w="full"
+                    >
+                        Login
+                    </Button>
+                    {flash.error && (
+                        <Alert variant="error" message={flash.error} />
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
+                </VStack>
+                <p className="text-center text-base mt-5">
+                    Belum punya akun?{" "}
+                    <Link
+                        href="/register"
+                        className="font-bold hover:underline"
+                    >
+                        Sign Up
+                    </Link>
+                </p>
             </form>
-        </GuestLayout>
+        </AuthLayout>
     );
 }

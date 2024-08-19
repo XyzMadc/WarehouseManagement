@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('cover')->nullable();
+            $table->integer('total_item');
+            $table->string('jenis');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

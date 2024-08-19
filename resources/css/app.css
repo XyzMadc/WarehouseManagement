@@ -1,3 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400;500;600;700&family=Oooh+Baby&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+    scroll-behavior: smooth;
+}
+
+* {
+    @apply font-main;
+}
+
+.shadow-top-right-bottom {
+    box-shadow: 20px 20px 5px -5px rgba(100, 100, 100, 100.75);
+}
+
+.none-scrollbar {
+    scrollbar-width: none;
+}
+
+.none-scrollbar::-webkit-scrollbar {
+    display: none;
+}

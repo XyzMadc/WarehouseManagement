@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('username', 100);
             $table->string('password');
-            $table->string('nis');
-            $table->string('class');
+            $table->string('nis')->unique();
+            $table->string('kelas');
             $table->timestamps();
         });
     }
